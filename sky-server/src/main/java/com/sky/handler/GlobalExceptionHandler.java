@@ -18,17 +18,19 @@ public class GlobalExceptionHandler {
 
     /**
      * 捕获业务异常
+     *
      * @param ex
      * @return
      */
     @ExceptionHandler
-    public Result exceptionHandler(BaseException ex){
+    public Result exceptionHandler(BaseException ex) {
         log.error("异常信息：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
     /**
      * 处理用户名已存在异常
+     *
      * @param ex
      * @return
      */
@@ -36,6 +38,8 @@ public class GlobalExceptionHandler {
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex) {
 
         String message = ex.getMessage();
+
+        //  先判断是否是我们想的那个异常, 既用户名重复, 如果是我们处理, 否者抛出未知异常
         if (message.contains("Duplicate entry")) {
             String[] split = message.split(" ");
             String username = split[2];
