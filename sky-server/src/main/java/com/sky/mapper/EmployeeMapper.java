@@ -25,4 +25,15 @@ public interface EmployeeMapper {
 
     //  这里就不使用注解的方式来书写了, 动态 SQL 较复杂
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 根据 主键动态修改属性
+     * @param employee
+     */
+
+    //  TODO 关于这里的属性名对应不太明白, 后续再补吧
+    void update(Employee employee);
+
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }

@@ -66,6 +66,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    /**
+     * 新增员工
+     * @param employeeDTO
+     */
     @Override
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
@@ -99,6 +103,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         //  这里可以简化分页查询
@@ -113,6 +122,52 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //  封装结果
         return new PageResult(total, records);
+    }
+
+    /**
+     * 修改员工状态
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+        //  这里我们采用新建一个 Employee 对象来传输数据
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        System.out.println("employee");
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据 id 查询员工信息
+     * @param id
+     * @return
+     */
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+
+        //  对密码进行隐藏
+        employee.setPassword("******");
+        return employee;
+    }
+
+    /**
+     * 更新员工信息
+     * @param employeeDTO
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        //  因为已经有过更新的 SQL 语句了, 这里我们之间调用即可
+        //  当然, 前提是先将它转换为 Employee 类型的对象
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
     }
 
 }

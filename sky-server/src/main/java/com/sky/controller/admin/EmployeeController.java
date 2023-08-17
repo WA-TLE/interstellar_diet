@@ -13,6 +13,7 @@ import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -108,8 +109,47 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 员工状态修改
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")    //  2023-8-17 21:06:23, 这里的请求写成了 Get!!! 调试了好久好久
+    @ApiOperation("员工状态修改")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        //  打印一个日志
+        log.info("启用员工账号: {}, {}", status, id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据 id 查询员工
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据 id 查询员工")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("查询 id 为 {} 的员工", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
 
 
+    /**
+     * 更新员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("更新员工信息")
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("更新员工编号为 {} 的信息", employeeDTO.getId());
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
 
 
 

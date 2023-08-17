@@ -5,10 +5,34 @@
     <select id="pageQuery" resultType="com.sky.entity.Employee">
         select * from employee
         <where>
-            <if test = "name != null and name != ''">
+            <if test="name != null and name != ''">
                 and name like concat('%', #{name}, '%')
             </if>
         </where>
         order by create_time desc
     </select>
+
+    <update id="update" parameterType="Employee">
+        update employee
+        <set>
+            /*
+
+                这里写的应该就是标准写法, 第二个字段对应的是数据库的字段名
+            */
+            <if test="name != null">name = #{name},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="idNumber != null">id_number = #{idNumber},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+        </set>
+            /*这里怎么可以忘记写 限制条件呢? 鱼皮哥公司上次的事故你忘了?????*/
+        where id = #{id}
+    </update>
+
+
+
 </mapper>
