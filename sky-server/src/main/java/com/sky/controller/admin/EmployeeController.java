@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * 员工管理
  */
-@RestController
+@RestController //  等同于 @Controller + @ResponseBody
 @RequestMapping("/admin/employee")
 @Slf4j
 @Api(tags = "员工相关接口")
@@ -110,13 +110,14 @@ public class EmployeeController {
     }
 
     /**
-     * 员工状态修改
+     * 启用禁用员工账号
      * @param status
      * @param id
      * @return
      */
+
     @PostMapping("/status/{status}")    //  2023-8-17 21:06:23, 这里的请求写成了 Get!!! 调试了好久好久
-    @ApiOperation("员工状态修改")
+    @ApiOperation("启用禁用员工账号")
     public Result startOrStop(@PathVariable Integer status, Long id) {
         //  打印一个日志
         log.info("启用员工账号: {}, {}", status, id);
@@ -126,6 +127,11 @@ public class EmployeeController {
 
     /**
      * 根据 id 查询员工
+     * 这里的请求路径是这样的 http://localhost/api/employee/status/0?id=20
+     * 其中 http://localhost/api/employee/status 是路径
+     * /0 是 rest 风格的参数传递
+     * ?id=20 是 Query 形式的参数传递
+     * ok 困扰我那么久的问题解决了 哈哈哈
      * @param id
      * @return
      */

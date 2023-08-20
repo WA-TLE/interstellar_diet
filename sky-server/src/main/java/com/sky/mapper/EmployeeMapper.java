@@ -23,6 +23,7 @@ public interface EmployeeMapper {
             "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{createTime},#{updateTime},#{createUser},#{updateUser},#{status})")
     void insert(Employee employee);
 
+
     //  这里就不使用注解的方式来书写了, 动态 SQL 较复杂
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
@@ -31,7 +32,6 @@ public interface EmployeeMapper {
      * @param employee
      */
 
-    //  TODO 关于这里的属性名对应不太明白, 后续再补吧
     void update(Employee employee);
 
     @Select("select * from employee where id = #{id}")

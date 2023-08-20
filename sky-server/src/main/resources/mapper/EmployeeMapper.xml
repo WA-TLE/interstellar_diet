@@ -17,6 +17,7 @@
         <set>
             /*
 
+
                 这里写的应该就是标准写法, 第二个字段对应的是数据库的字段名
             */
             <if test="name != null">name = #{name},</if>
@@ -26,8 +27,8 @@
             <if test="sex != null">sex = #{sex},</if>
             <if test="idNumber != null">id_number = #{idNumber},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
-            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="updateTime != null">update_Time = #{updateTime},</if>
+            <if test="updateUser != null">update_User = #{updateUser},</if>
         </set>
             /*这里怎么可以忘记写 限制条件呢? 鱼皮哥公司上次的事故你忘了?????*/
         where id = #{id}

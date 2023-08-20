@@ -110,13 +110,15 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        //
+        //  此处使用 mybatis 的分页插件 PageHelper 来简化分页代码的开发。底层基于 mybatis 的拦截器实现
         //  这里可以简化分页查询
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
-        //  用了别人的分页查询, 就应该按照他的规则来
+        //  用了别人的分页查询, 就应该按照他的规则来, 这里返回的东西就是别人指定的
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
-        //  从  PageHelper.startPage 返回的对象里取出我们需要的数据
+        //  从使用 PageHelper.startPage 后, 返回的对象里取出我们需要的数据
         long total = page.getTotal();
         List<Employee> records = page.getResult();
 
