@@ -1,0 +1,114 @@
+package com.sky.service.impl;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
+import com.sky.dto.DishPageQueryDTO;
+import com.sky.dto.SetmealDTO;
+import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealDishMapper;
+import com.sky.mapper.SetmealMapper;
+import com.sky.result.PageResult;
+import com.sky.service.SetMealService;
+import com.sky.vo.SetmealVO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * @Author: dy
+ * @Date: 2023/8/25 19:21
+ * @Description: 套餐相关业务实现
+ */
+@Service
+@Slf4j
+public class SetMealServiceImpl implements SetMealService {
+
+    @Autowired
+    private SetmealMapper setmealMapper;
+
+    @Autowired
+    private SetMealDishMapper setMealDishMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    /**
+     * 新增套餐, 同时需要保存套餐和菜品的关联关系
+     * @param setmealDTO
+     */
+    @Transactional
+    public void saveWithDish(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        //  向套餐中添加数据
+        setmealMapper.insert(setmeal);
+
+        //  取出套餐生成的 id
+        Long setmealId = setmeal.getId();
+
+        //  取出绑定该套餐的菜品
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+
+        //  设置这些菜品所对应的套餐 id
+        setmealDishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmealId);
+        });
+
+        //  保存套餐和菜品的关系
+        setMealDishMapper.insertBatch(setmealDishes);
+    }
+
+    /**
+     * 套餐分页查询
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
+        //  mybatis 提供的分页插件
+        PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
+
+        Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
+
+
+
+        return new PageResult(page.getTotal(), page.getResult());
+    }
+
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    public void deleteByIds(List<Long> ids) {
+
+        //  这里假定套餐起售状态不能删除
+        for (Long id : ids) {
+            Setmeal setmeal = setmealMapper.getById(id);
+
+            if (Objects.equals(setmeal.getStatus(), StatusConstant.ENABLE)) {
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+
+
+        for (Long setmealId : ids) {
+            setmealMapper.deleteByIds(setmealId);
+            log.info("删除关联的数据: {}", setmealId);
+            setMealDishMapper.deleteBySetMealId(setmealId);
+        }
+
+
+    }
+}

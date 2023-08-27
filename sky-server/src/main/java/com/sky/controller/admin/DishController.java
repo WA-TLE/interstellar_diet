@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -60,7 +61,7 @@ public class DishController {
     }
 
     /**
-     * 删除菜品
+     * 批量删除菜品
      * @param ids
      * @return
      */
@@ -73,7 +74,8 @@ public class DishController {
     }
 
     /**
-     * 根据 id 查询菜品
+     * 根据 id 查询菜品 <br>
+     * 这里查询的菜品是用来展示的, 所以我们用的是 dishVo 对象
      * @param id
      * @return
      */
@@ -95,6 +97,14 @@ public class DishController {
     @PutMapping
     @ApiOperation("修改菜品")   //  这里的参数类型最开始写错了, 我使用的是 VO (以后要具体分析了)
     public Result update(@RequestBody DishDTO dishDTO) {
+        /*
+            其实这里用什么参数的话, 我们可以这样分析
+            VO 和 DTO 的差别主要就是
+            VO 展示的有 更新时间, 分类没名称
+            像这两个属性, 在数据传输的时候压根就用不着
+            更新时间会自动更改的
+            分类名称不需要, 我们有分类 id
+         */
         log.info("修改菜品: {}", dishDTO);
 
         dishService.updateWithFlavor(dishDTO);
@@ -120,6 +130,20 @@ public class DishController {
         return Result.success();
     }
 
+
+    /**
+     * 根据分类 id 查询菜品
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据分类 id 查询菜品")
+    public Result<List<Dish>> list(Long categoryId) {
+        log.info("根据分类 id 查询菜品: {}", categoryId);
+        List<Dish> list = dishService.list(categoryId);
+
+        return Result.success(list);
+    }
 
 
 

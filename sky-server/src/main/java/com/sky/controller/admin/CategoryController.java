@@ -91,14 +91,31 @@ public class CategoryController {
     }
 
     /**
-     * 根据类型查询分类
+     * 根据类型查询分类<br>
+     *
+     * 2023-8-26 17:44:34<br>
+     * 终于明白彻底明白这个接口的作用了
+     * 所谓分类, 包括菜品分类, 套餐分类<br>
+     * 菜品分类: 时令鲜蔬, 传统主食, 酒水饮料等......<br>
+     * 套餐分类: 人气套餐, 商务套餐等....<br>
+     * <p>
+     *      而关键点在于 人气套餐, 商务套餐, 时令鲜蔬, 传统主食, 酒水饮料
+     *      它们都在一张表里面存储着, 这个表叫做分类表!!!
+     *      辨别他们的区分他们的办法就是他们的 type 字段
+     *
+     * </p>
+     * <p>
+     *     那么这个接口是什么时候调用呢??<br>
+     *     答: 在新建菜品, 新建套餐的时候(当然修改, 用户端访问也会调用...)
+     *     在我们进行着新建的时候, 就要根据"分类"来指定我们新建 菜品or套餐 的定位
+     * </p>
      * @param type
      * @return
      */
     @GetMapping("/list")
     @ApiOperation("根据类型查询分类")
     public Result<List<Category>> list(Integer type){
-        log.info("查询菜品分类 {}", type);
+        log.info("查询分类 {}", type);
         List<Category> list = categoryService.list(type);
         return Result.success(list);
     }

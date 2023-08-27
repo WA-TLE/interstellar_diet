@@ -67,7 +67,6 @@ public class DishServiceImpl implements DishService {
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
                 log.info("设置菜品 id ....");
-                log.info("设置菜品 id ....");
             });
             //  向口味中插入数据
             dishFlavorMapper.insertBatch(flavors);
@@ -116,6 +115,8 @@ public class DishServiceImpl implements DishService {
         //  先判断能否删除---是否关联套餐
         List<Long> setMealIds = setMealDishMapper.getSetMealIdByDishIds(ids);
 
+        //  也就是这里要做得仅仅就是查询一下, 看是否关联套餐
+        //  有一个表是单独描述 菜品 和 套餐 的关系的
         if (setMealIds != null && setMealIds.size() > 0) {
             //  要删除的菜品关联的套餐,无法删除, 抛出相关异常
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
@@ -129,6 +130,8 @@ public class DishServiceImpl implements DishService {
             dishMapper.deleteById(id);
 
             //  删除菜品相关口味
+            //  注意: 这里是批量删除, 因为我们根据的是菜品的 id 来删除数据的
+            //  菜品的 id 并不作为主键, 可能有好多口味都对应的有该菜品的 id
             dishFlavorMapper.deleteByDishId(id);
         }
 
@@ -198,13 +201,13 @@ public class DishServiceImpl implements DishService {
      */
     public void startOrStop(Integer status, Long id) {
 
-        //  这里动用查询操作不太好, 我们仅仅是更新状态
-        //  没有必要从数据库中把所有要更改的数据拿出来
-        //  这里我们采用直接 new 一个的方式 (从数据库中查询也需要时间)
-        //  Dish dish = dishMapper.getById(id);
+          /*这里动用查询操作不太好, 我们仅仅是更新状态
+          没有必要从数据库中把所有要更改的数据拿出来
+          这里我们采用直接 new 一个的方式 (从数据库中查询也需要时间)
+          Dish dish = dishMapper.getById(id);
 
-        //  这里才是正规的操作, 在更改状态的时候, 因为之前已经写过 Update 了
-        //  所以这里我们之间用即可 (否者的话, 修改时间你怎么办???)
+          这里才是正规的操作, 在更改状态的时候, 因为之前已经写过 Update 了
+          所以这里我们之间用即可 (否者的话, 修改时间你怎么办???)*/
         Dish dish = Dish.builder()
                 .id(id)
                 .status(status)
@@ -227,7 +230,7 @@ public class DishServiceImpl implements DishService {
                 /*
                     这里我们依旧不采用从数据库中查询的手段
                     而是直接 builder 一个套餐对象, 把他对应的 id 和 status 给他
-                    之后直接跟新套餐即可
+                    之后直接更新套餐即可
                  */
                 for (Long setMeanId : setMeanIds) {
                     Setmeal setMeal = Setmeal.builder()
@@ -243,6 +246,34 @@ public class DishServiceImpl implements DishService {
         }
 
 
+    }
+
+    /**
+     * 根据分类 id 查询菜品
+     * @param categoryId
+     * @return
+     */
+    public List<Dish> list(Long categoryId) {
+        /*
+            List<Dish> list = dishMapper.list(categoryId);
+            这里有待改进
+            虽说是根据 categoryId(类别id) 来查询对应的菜品
+            但是我仅仅就根据 categoryId 来查询是不是不太好???
+            如果下次是根据 类别名称 来查询对应的菜品呢?
+            我还要再写个接口??
+
+            所以这里改为根据类别的某些信息来查询, 方便下次复用
+
+         */
+
+        //  如果该类别被禁用了, 那么就不能查询到
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        List<Dish> list = dishMapper.list(dish);
+
+        return list;
     }
 }
 

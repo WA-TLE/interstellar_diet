@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -69,4 +71,12 @@ public interface DishMapper {
     @Update("update dish set status = #{status} where id = #{id}")
     @AutoFill(OperationType.UPDATE)
     void setStatus(Integer status, Long id);
+
+    /**
+     * 根据分类 id 查询菜品
+     * @param categoryId
+     * @return
+     */
+
+    List<Dish> list(Dish dish);
 }

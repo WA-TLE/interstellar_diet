@@ -29,12 +29,16 @@ public class AutoFillAspect {
      * 定义切入点
      */
     @Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotation.AutoFill)")
-    public void autoFillPointcut(){};
+    public void autoFillPointcut() {
+    }
+
+    ;
 
     @Before("autoFillPointcut()")
     public void autofill(JoinPoint joinPoint) {
         log.info("开始进行公共字段的自动填充");
 
+        //
         //  这里可以将要做的步骤写出来
 
         //  0.1 获取当前被拦截的方法上的数据库操作类型
@@ -70,17 +74,25 @@ public class AutoFillAspect {
             try {
                 //  1. 通过 getClass() 方法获取获取我们 entity 的类 (执行反射的前一步)
                 //  2. 通过 getDeclaredMethod(*, *) 获取该对象中对应名称和参数的方法
-                Method setCreateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
-                Method setCreateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_USER, Long.class);
-                Method setUpdateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
+                Method setCreateTime = entity
+                        .getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
+                Method setCreateUser = entity
+                        .getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_CREATE_USER, Long.class);
+                Method setUpdateTime = entity.
+                        getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
+                Method setUpdateUser = entity
+                        .getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
 
                 //通过反射为对象属性赋值
                 //  在这里调用我们刚才获取的四个方法, 分别为他们赋值
-                setCreateTime.invoke(entity,now);
-                setCreateUser.invoke(entity,currentId);
-                setUpdateTime.invoke(entity,now);
-                setUpdateUser.invoke(entity,currentId);
+                setCreateTime.invoke(entity, now);
+                setCreateUser.invoke(entity, currentId);
+                setUpdateTime.invoke(entity, now);
+                setUpdateUser.invoke(entity, currentId);
 
                 /*
                 概述:
@@ -100,12 +112,16 @@ public class AutoFillAspect {
         } else if (operationType == OperationType.UPDATE) {
             //为2个公共字段赋值
             try {
-                Method setUpdateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
+                Method setUpdateTime = entity
+                        .getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
+                Method setUpdateUser = entity
+                        .getClass()
+                        .getDeclaredMethod(AutoFillConstant.SET_UPDATE_USER, Long.class);
 
                 //通过反射为对象属性赋值
-                setUpdateTime.invoke(entity,now);
-                setUpdateUser.invoke(entity,currentId);
+                setUpdateTime.invoke(entity, now);
+                setUpdateUser.invoke(entity, currentId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
