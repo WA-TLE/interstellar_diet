@@ -10,6 +10,7 @@ import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.License;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,21 @@ public class SetMealController {
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("修改套餐: {}", setmealDTO);
         setMealService.update(setmealDTO);
+        return Result.success();
+    }
+
+    /**
+     * 套餐起售停售
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("套餐起售停售")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("套餐起售停售: {}, {}", id, status);
+
+        setMealService.startOrStop(status, id);
+
         return Result.success();
     }
 

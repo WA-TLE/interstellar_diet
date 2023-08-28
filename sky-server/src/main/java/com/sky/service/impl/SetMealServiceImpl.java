@@ -7,9 +7,11 @@ import com.sky.constant.StatusConstant;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.SetmealEnableFailedException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetMealDishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -125,9 +127,11 @@ public class SetMealServiceImpl implements SetMealService {
         //  根据套餐 id 查询套餐所对应的菜品
         List<SetmealDish> setMealDish = setMealDishMapper.getBySetMealId(id);
 
+        //  创建视图对象
         SetmealVO setmealVO = new SetmealVO();
-        BeanUtils.copyProperties(setmeal, setmealVO);
 
+        //  拷贝属性
+        BeanUtils.copyProperties(setmeal, setmealVO);
         setmealVO.setSetmealDishes(setMealDish);
 
         return setmealVO;
@@ -160,6 +164,36 @@ public class SetMealServiceImpl implements SetMealService {
         //  新建菜品套餐数据
         setMealDishMapper.insertBatch(setMealDishes);
 
+
+    }
+
+    /**
+     * 套餐起售停售
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+
+        if (Objects.equals(status, StatusConstant.ENABLE)) {
+            List<Dish> dishList = dishMapper.getBySetMealId(id);
+
+            if (dishList != null && dishList.size() > 0) {
+                for (Dish dish : dishList) {
+                    if (StatusConstant.DISABLE == dish.getStatus()) {
+                        throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                    }
+                }
+            }
+        }
+
+        //  创建套餐对象
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        //  根据套餐 id 修改套餐状态
+        setmealMapper.update(setmeal);
+        //  首先先判断当前套餐所包含的所用菜品是否起售
 
     }
 }
