@@ -16,3 +16,6 @@ sky:
     port: 6379
     password: dingyu
     database: 10
+  wechat:
+    appid: wx72157da9e3968345
+    secret: d6377313f3ac3bd12b0732a82cc326a4
