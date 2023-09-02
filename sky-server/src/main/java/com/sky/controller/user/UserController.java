@@ -45,6 +45,7 @@ public class UserController {
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
         log.info("微信用户登录: {}", userLoginDTO.getCode());
 
+        //  userLoginDTO 唯一的作用就是传输 临时登录凭证 code
         User user = userService.wxLogin(userLoginDTO);
 
         //  为微信用户生成 jwt 令牌

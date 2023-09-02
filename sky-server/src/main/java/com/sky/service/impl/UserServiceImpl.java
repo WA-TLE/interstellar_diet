@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
      */
     public User wxLogin(UserLoginDTO userLoginDTO) {
 
+        //  这里根据 临时登录凭证code, 来获得微信用户的唯一凭证 openid
         String openid = getOpenid(userLoginDTO.getCode());
 
         //  判断 openid 是否为空
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService {
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
 
-        //  判断当前用户是否为信用户
+        //  判断当前用户是否为新用户
         User user = userMapper.getByOpenid(openid);
 
         //  如果新用户, 自动注册
