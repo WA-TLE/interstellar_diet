@@ -1,8 +1,11 @@
 package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -11,10 +14,13 @@ import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.properties.WeChatProperties;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +38,7 @@ import java.util.List;
  * @Description:
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrdersMapper orderMapper;   //  操作订单表
@@ -59,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
         //  判断用户提交的数据是否合法, 地址簿, 购物车数据是否存在
 
         //  判断地址簿是否存在
-        //      怎么判断呢? OrdersSubmitDTO 对应的用 地址簿 id
+        //      怎么判断呢? OrdersSubmitDTO 对应的有地址簿 id
 
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
         if (addressBook == null) {
@@ -113,7 +120,6 @@ public class OrderServiceImpl implements OrderService {
         orderDetailMapper.insertBatch(orderDetails);
 
 
-
         //  清空购物车数据
         shoppingCartMapper.deleteShoppingCart(shoppingCarts.get(0));
         //  封装 vo 对象
@@ -149,8 +155,8 @@ public class OrderServiceImpl implements OrderService {
         JSONObject jsonObject = new JSONObject();
 
 
-
         if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+            log.info("订单已支付: ");
             throw new OrderBusinessException("该订单已支付");
         }
 
@@ -180,6 +186,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderMapper.update(orders);
 
+        //  这个目前没有用着
         HashMap<Object, Object> map = new HashMap<>();
         map.put("type", 1);
         map.put("orderId", ordersDB.getId());
@@ -188,5 +195,57 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    /**
+     * 历史订单分页查询
+     *
+     * @param pageNUm
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    public PageResult pageQuery(Integer pageNUm, Integer pageSize, Integer status) {
+        // 首先使用 Mybatis 的分页查询方法
+        PageHelper.startPage(pageNUm, pageSize);
+       /*
+            关于这里的分页查询, 在做之前, 我们要搞明白, 返回的 Vo 对象是什么
+            然后才能对应的封装对象
+            就像这个, 前端需要的是 OrderVo 它继承了 Orders, 拥有它的全部属性
+            另外还多了一个 private List<OrderDetail> orderDetailList; 属性
+            把这些给前端, 他就可以展示了
+        */
 
+        //  这里咱们要做分页条件查询, 而条件我们使用 OrdersPageQueryDTO 来封装
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setStatus(status);
+
+        //  返回结果是固定的
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+                ArrayList<OrderVO> list = new ArrayList<>();
+
+                if (page != null && page.size() > 0) {
+                    for (Orders orders : page) {
+                        //  根据订单查询订单明细
+                        //  获得订单 id
+                        Long ordersId = orders.getId();
+                        //  根据订单 id 查询订单明细
+                        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(ordersId);
+                /*
+                    这里终于是搞明白了
+                    原来 OrderVo 继承了 Order!!!!
+                    我说怎么从那里搞出来那么多属性
+                    -------------------------------
+                    另外, 这个接口的调用频率挺高的, 个人中心里面有最近订单, 历史订单里面也会调用
+                 */
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                orderVO.setOrderDetailList(orderDetails);
+                log.info("orderVo 的 orderDishes: {}", orderVO.getOrderDishes());
+                log.info("orderVo 的 orderDetailList: {}", orderVO.getOrderDetailList());
+                list.add(orderVO);
+            }
+        }
+
+        return new PageResult(page.getTotal(), list);
+    }
 }
