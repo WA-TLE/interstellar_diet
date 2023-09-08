@@ -7,9 +7,9 @@ import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -72,6 +72,19 @@ public class OrderController {
         log.info("历史订单分页查询: ");
         PageResult pageResult = orderService.pageQuery(page, pageSize, status);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 查看订单详情
+     * @param id
+     * @return
+     */
+    @GetMapping("/orderDetail/{id}")
+    @ApiOperation("查看订单详情")
+    public Result<OrderVO> orderDetail(@PathVariable Long id) {
+        log.info("查看订单详情: {}", id);
+        OrderVO orderVO = orderService.selectOrderDetailById(id);
+        return Result.success(orderVO);
     }
 
 
