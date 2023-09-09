@@ -13,7 +13,6 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
-import com.sky.properties.WeChatProperties;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
@@ -26,11 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: dy
@@ -221,15 +220,15 @@ public class OrderServiceImpl implements OrderService {
 
         //  返回结果是固定的
         Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
-                ArrayList<OrderVO> list = new ArrayList<>();
+        ArrayList<OrderVO> list = new ArrayList<>();
 
-                if (page != null && page.size() > 0) {
-                    for (Orders orders : page) {
-                        //  根据订单查询订单明细
-                        //  获得订单 id
-                        Long ordersId = orders.getId();
-                        //  根据订单 id 查询订单明细
-                        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(ordersId);
+        if (page != null && page.size() > 0) {
+            for (Orders orders : page) {
+                //  根据订单查询订单明细
+                //  获得订单 id
+                Long ordersId = orders.getId();
+                //  根据订单 id 查询订单明细
+                List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(ordersId);
                 /*
                     这里终于是搞明白了
                     原来 OrderVo 继承了 Order!!!!
@@ -251,6 +250,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查看订单详情
+     *
      * @param id
      * @return
      */
@@ -271,6 +271,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 取消订单
+     *
      * @param id
      */
     public void userCancelById(Long id) throws Exception {
@@ -314,5 +315,87 @@ public class OrderServiceImpl implements OrderService {
         orders.setCancelReason("用户取消");
         orders.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    /**
+     * 再来一单
+     *
+     * @param id
+     */
+    @Transactional
+    public void repetition(Long id) {
+        /*
+            这里是业务逻辑理解错了, 是因为我不常点外卖?
+            这里的再来一单, 要求的不是重新提交订单, 然后支付
+            而是把订单里面的数据重新加入购物车....
+            我完全理解错业务逻辑了
+         */
+
+        /*  错误逻辑
+        //  根据订单 id 查询订单
+        Orders order = orderMapper.getById(id);
+        //  根据订单 id 查询订单明细
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+
+        //  插入订单数据
+        orderMapper.insert(order);
+        //  插入订单明细数据
+        orderDetailMapper.insertBatch(orderDetails);
+
+        //  封装 vo 对象
+        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
+                .id(order.getId())
+                .orderNumber(order.getNumber())
+                .orderAmount(order.getAmount())
+                .orderTime(order.getOrderTime())
+                .build();
+
+        return orderSubmitVO;*/
+        /*
+         Java 8 中的 Stream API 写法
+        //  查询当前用户 id
+        Long userId = BaseContext.getCurrentId();
+
+        //  根据订单 id 查询当前订单详情
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+
+        // 将订单详情对象转换为购物车对象
+        List<ShoppingCart> shoppingCartList = orderDetailList.stream().map(x -> {
+            ShoppingCart shoppingCart = new ShoppingCart();
+
+            // 将原订单详情里面的菜品信息重新复制到购物车对象中
+            BeanUtils.copyProperties(x, shoppingCart, "id");
+            shoppingCart.setUserId(userId);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+
+            return shoppingCart;
+        }).collect(Collectors.toList());*/
+
+
+        //  查询当前用户 id
+        Long userId = BaseContext.getCurrentId();
+
+        // 根据订单 id 查询当前订单详情
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+
+        // 创建一个空购物车对象列表
+        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+
+        // 遍历订单详情列表
+        for (OrderDetail orderDetail : orderDetailList) {
+            ShoppingCart shoppingCart = new ShoppingCart();
+
+            // 将原订单详情里面的菜品信息重新复制到购物车对象中
+            BeanUtils.copyProperties(orderDetail, shoppingCart, "id");
+            shoppingCart.setUserId(userId);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+
+            // 将购物车对象添加到购物车列表中
+            shoppingCartList.add(shoppingCart);
+        }
+
+        shoppingCartMapper.insertBatch(shoppingCartList);
+
+
     }
 }

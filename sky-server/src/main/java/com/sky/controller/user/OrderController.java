@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController("userOrderController")  //  这里起个别名, 因为在 admin 也会有这个模块, 防止重名
 @RequestMapping("/user/order")
-@Api("c端-用户订单模块")
+@Api(tags = "c端-用户订单模块")
 @Slf4j
 public class OrderController {
 
@@ -30,6 +30,7 @@ public class OrderController {
 
     /**
      * 用户提交订单
+     *
      * @param ordersSubmitDTO
      * @return
      */
@@ -43,6 +44,7 @@ public class OrderController {
 
     /**
      * 订单支付
+     *
      * @param ordersPaymentDTO
      * @return
      */
@@ -61,6 +63,7 @@ public class OrderController {
 
     /**
      * 历史订单分页查询
+     *
      * @param page
      * @param pageSize
      * @param status
@@ -76,6 +79,7 @@ public class OrderController {
 
     /**
      * 查看订单详情
+     *
      * @param id
      * @return
      */
@@ -89,6 +93,7 @@ public class OrderController {
 
     /**
      * 取消订单
+     *
      * @param id
      * @return
      */
@@ -101,6 +106,19 @@ public class OrderController {
     }
 
 
+    /**
+     * 再来一单
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("再来一单")
+    public Result repetition(@PathVariable Long id) {
+        log.info("再来一单: {}", id);
+        orderService.repetition(id);
+        return Result.success();
+    }
 
 
 }

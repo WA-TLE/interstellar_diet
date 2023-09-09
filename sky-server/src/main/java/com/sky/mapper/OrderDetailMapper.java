@@ -16,12 +16,14 @@ import java.util.List;
 public interface OrderDetailMapper {
     /**
      * 向订单明细表中插入 n 条数据
+     *
      * @param orderDetails
      */
-    void insertBatch(ArrayList<OrderDetail> orderDetails);
+    void insertBatch(List<OrderDetail> orderDetails);
 
     /**
      * 根据订单 id 查询订单明细
+     *
      * @param ordersId
      * @return
      */

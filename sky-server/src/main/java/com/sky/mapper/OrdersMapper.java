@@ -15,12 +15,14 @@ import org.apache.ibatis.annotations.Select;
 public interface OrdersMapper {
     /**
      * 向订单表里插入一条数据
+     *
      * @param order
      */
     public void insert(Orders order);
 
     /**
      * 根据订单号查询订单
+     *
      * @param orderNumber
      */
     @Select("select * from orders where number = #{orderNumber}")
@@ -28,6 +30,7 @@ public interface OrdersMapper {
 
     /**
      * 修改订单信息
+     *
      * @param orders
      */
     void update(Orders orders);
@@ -36,6 +39,7 @@ public interface OrdersMapper {
 
     /**
      * 根据订单 id 查询订单
+     *
      * @param id
      * @return
      */
