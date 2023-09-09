@@ -35,6 +35,11 @@ public interface OrdersMapper {
      */
     void update(Orders orders);
 
+    /**
+     *  根据条件查询订单
+     * @param ordersPageQueryDTO
+     * @return
+     */
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 
     /**
@@ -45,4 +50,8 @@ public interface OrdersMapper {
      */
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+
+
+    @Select("select * from orders")
+    Page<Orders> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 }
