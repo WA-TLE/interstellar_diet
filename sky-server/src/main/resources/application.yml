@@ -62,3 +62,8 @@ sky:
     weChatPayCertFilePath: ${sky.wechat.weChatPayCertFilePath}
     notifyUrl: ${sky.wechat.notifyUrl}
     refundNotifyUrl: ${sky.wechat.refundNotifyUrl}
+
+  shop:
+    address: 河南省洛阳市洛龙区洛阳师范学院
+  baidu:
+      ak: dwPFIH9O1SoYMY1gnbqGWrafdbQU9Sw9
