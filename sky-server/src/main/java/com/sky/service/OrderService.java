@@ -105,4 +105,11 @@ public interface OrderService {
      * @param ordersCancelDTO
      */
     void cancelOrder(OrdersCancelDTO ordersCancelDTO) throws Exception;
+
+    /**
+     * 商家派送订单
+     *
+     * @param id
+     */
+    void delivery(Long id);
 }

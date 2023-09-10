@@ -20,6 +20,7 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -602,5 +603,25 @@ public class OrderServiceImpl implements OrderService {
         orders.setPayStatus(Orders.REFUND);
         orderMapper.update(orders);
 
+    }
+
+    /**
+     * 商家派送订单
+     *
+     * @param id
+     */
+    public void delivery(Long id) {
+        //  根据 id 查询订单
+        Orders orderDB = orderMapper.getById(id);
+
+        if (orderDB == null || !orderDB.getStatus().equals(Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+
+        orderMapper.update(orders);
     }
 }
