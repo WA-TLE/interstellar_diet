@@ -29,7 +29,7 @@ public interface OrdersMapper {
     Orders getByNumber(String orderNumber);
 
     /**
-     * 修改订单信息
+     * 根据订单 id 修改订单信息
      *
      * @param orders
      */

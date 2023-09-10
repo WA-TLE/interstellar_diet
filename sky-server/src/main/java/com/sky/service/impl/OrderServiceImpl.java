@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.xiaoymin.knife4j.core.util.CollectionUtils;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
@@ -506,5 +507,18 @@ public class OrderServiceImpl implements OrderService {
 
         return orderStatisticsVO;
 
+    }
+
+    /**
+     * 商家接单
+     * @param ordersConfirmDTO
+     */
+    public void confirmOrder(OrdersConfirmDTO ordersConfirmDTO) {
+        //  这里完全用不着属性拷贝, 仅仅只需要两个参数而已
+        Orders orders = Orders.builder()
+                .id(ordersConfirmDTO.getId())
+                .status(Orders.CONFIRMED)
+                .build();
+        orderMapper.update(orders);
     }
 }
