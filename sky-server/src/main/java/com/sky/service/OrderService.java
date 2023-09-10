@@ -98,4 +98,11 @@ public interface OrderService {
      * @param ordersRejectionDTO
      */
     void rejectionOrder(OrdersRejectionDTO ordersRejectionDTO) throws Exception;
+
+    /**
+     * 商家取消订单
+     *
+     * @param ordersCancelDTO
+     */
+    void cancelOrder(OrdersCancelDTO ordersCancelDTO) throws Exception;
 }
