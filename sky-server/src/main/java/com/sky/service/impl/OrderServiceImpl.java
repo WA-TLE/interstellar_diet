@@ -22,6 +22,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
@@ -55,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -197,13 +200,18 @@ public class OrderServiceImpl implements OrderService {
 
         orderMapper.update(orders);
 
-        //  这个目前没有用着
+        /*   这个目前没有用着
+                这里是提醒商家接单的业务功能
+                通过 Map 构建 json
+                然后发送回前端
+         */
         HashMap<Object, Object> map = new HashMap<>();
         map.put("type", 1);
         map.put("orderId", ordersDB.getId());
         map.put("content", "订单号: " + outTradeNo);
 
-
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
