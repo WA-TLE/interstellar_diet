@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             //  地址簿为空, 抛出业务异常
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
-        checkOutOfRange(addressBook.getCityName() + addressBook.getDistrictName() + addressBook.getDetail());
+        //checkOutOfRange(addressBook.getCityName() + addressBook.getDistrictName() + addressBook.getDetail());
 
         //  判断购物车中的数据是否为空
         //  获取当前登陆用户 id
