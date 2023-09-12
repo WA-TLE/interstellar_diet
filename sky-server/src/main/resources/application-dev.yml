@@ -8,8 +8,8 @@ sky:
     password: dingyu
   alioss:
     endpoint: oss-cn-hangzhou.aliyuncs.com
-    access-key-id: LTAI5tRpFqXXYiWAfRDH5F9Y
-    access-key-secret: 3V5dfR8WjJ7LcqYxTb15Q5SoQUHDDf
+    access-key-id: LTAI5tLXBVXe4DRnrjJNPy56
+    access-key-secret: YzaJxLRz2dpnvY7KlvHKH3gJ04SbgZ
     bucket-name: sky-take-out
   redis:
     host: localhost

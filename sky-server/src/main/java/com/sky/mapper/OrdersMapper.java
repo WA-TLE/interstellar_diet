@@ -5,10 +5,10 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.data.redis.connection.ReactiveListCommands;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: dy
@@ -71,4 +71,12 @@ public interface OrdersMapper {
      */
     @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime orderTime);
+
+    /**
+     * 查询当天所有营业额
+     *
+     * @param hashMap
+     * @return
+     */
+    Double getSumTurnover(Map<Object, Object> hashMap);
 }

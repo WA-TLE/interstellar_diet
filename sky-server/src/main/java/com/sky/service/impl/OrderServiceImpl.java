@@ -666,12 +666,12 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(orders);
     }
 
-/*
-    *//**
-     * 检查客户的收货地址是否超出配送范围
+
+    /**
+     * 检查客户的收货地址是否超出配送范围 (!!!!!!!!)
      *
      * @param address
-     *//*
+     */
     private void checkOutOfRange(String address) {
 
         log.info("开始校验地址是否超出配送范围: {}", address);
@@ -732,7 +732,7 @@ public class OrderServiceImpl implements OrderService {
             //配送距离超过5000米
             throw new OrderBusinessException("超出配送范围");
         }
-    }*/
+    }
 
     /**
      * 用户催单
