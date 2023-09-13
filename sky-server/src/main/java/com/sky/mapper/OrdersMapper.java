@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,4 +80,12 @@ public interface OrdersMapper {
      * @return
      */
     Double getSumTurnover(Map<Object, Object> hashMap);
+
+    /**
+     * 根据状态和时间查询订单数量
+     *
+     * @param map
+     * @return
+     */
+    Integer getByStatusAndOrderTime(HashMap<Object, Object> map);
 }

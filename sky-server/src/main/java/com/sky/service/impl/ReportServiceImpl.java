@@ -4,6 +4,7 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrdersMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -134,10 +135,85 @@ public class ReportServiceImpl implements ReportService {
 
         return UserReportVO
                 .builder()
-                .dateList(StringUtils.join(dataList,','))
+                .dateList(StringUtils.join(dataList, ','))
                 .newUserList(StringUtils.join(newUserList, ','))
                 .totalUserList(StringUtils.join(totalUserList, ','))
                 .build();
 
+    }
+
+    /**
+     * 订单统计
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
+
+        //  构建日期列表
+        List<LocalDate> dataList = new ArrayList<>();
+        dataList.add(begin);
+
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dataList.add(begin);
+        }
+        Integer totalOrders = 0;
+        Integer validOrders = 0;
+        ArrayList<Integer> orderCountList = new ArrayList<>();
+        ArrayList<Integer> validOrderCountList = new ArrayList<>();
+
+        //  根据日期查询订单
+        for (LocalDate date : dataList) {
+            //  转化为 LocalDateTime 类型
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+            //  需要用到的查询条件封装到 Map 集合里面
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("begin", beginTime);
+            map.put("end", endTime);
+
+            //  查询当天所有订单数
+            Integer todayTotalOrder = ordersMapper.getByStatusAndOrderTime(map);
+
+            //  查询当天有效订单数
+            map.put("status", Orders.COMPLETED);
+            Integer todayValidOrder = ordersMapper.getByStatusAndOrderTime(map);
+
+            //  计算订单总数/有效订单数 (当天订单数相加)
+            totalOrders += todayTotalOrder;
+            validOrders += todayValidOrder;
+
+            //  封装到集合
+            orderCountList.add(todayTotalOrder);
+            validOrderCountList.add(todayValidOrder);
+        }
+
+//        //时间区间内的总订单数
+//        Integer totalOrders = orderCountList.stream().reduce(Integer::sum).get();
+//        //时间区间内的总有效订单数
+//        Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
+
+
+        //  1. 你这种 int 转 double 的方法是算法竞赛时的做法
+        //  2. 如果总营业额为 0 呢? 是不是就会抛异常了
+
+        double orderCompletionRate = 0.0;
+        if (totalOrders != 0) {
+//            orderCompletionRate =  ((double)validOrders / (double) totalOrders);
+            orderCompletionRate = validOrders.doubleValue() / totalOrders;
+        }
+
+        //  封装 VO 对象, 并返回
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dataList, ','))
+                .orderCountList(StringUtils.join(orderCountList, ','))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ','))
+                .orderCompletionRate(orderCompletionRate)
+                .totalOrderCount(totalOrders)
+                .validOrderCount(validOrders)
+                .build();
     }
 }
