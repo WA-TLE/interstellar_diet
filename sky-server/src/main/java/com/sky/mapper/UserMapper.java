@@ -4,6 +4,8 @@ import com.sky.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Map;
+
 /**
  * @Author: dy
  * @Date: 2023/9/1 17:35
@@ -32,4 +34,11 @@ public interface UserMapper {
      */
     @Select("select * from user where id = #{userId}")
     User getById(Long userId);
+
+    /**
+     * 根据动态条件, 查询用户数据
+     * @param map
+     * @return
+     */
+    Integer getUserStatistics(Map<Object, Object> map);
 }

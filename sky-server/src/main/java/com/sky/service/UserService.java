@@ -2,6 +2,9 @@ package com.sky.service;
 
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
+import com.sky.vo.UserReportVO;
+
+import java.time.LocalDate;
 
 /**
  * @Author: dy
@@ -17,5 +20,6 @@ public interface UserService {
      * @return
      */
     User wxLogin(UserLoginDTO userLoginDTO);
+
 
 }
