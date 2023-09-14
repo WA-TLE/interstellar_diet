@@ -89,7 +89,7 @@ public interface OrdersMapper {
      * @param map
      * @return
      */
-    Integer getByStatusAndOrderTime(HashMap<Object, Object> map);
+    Integer getByStatusAndOrderTime(Map<Object, Object> map);
 
     /**
      * 根据时间查询销量排名top10
